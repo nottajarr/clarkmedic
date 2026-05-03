@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clark — Entendé lo que te pasa</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul:         #0E3B5C;
+    --salvia:       #6A9A7B;
+    --crema:        #F5F2EC;
+    --ocre:         #C97B4B;
+    --carbon:       #1A1A1A;
+    --texto-muted:  #4A5A52;
+    --salvia-bg:    rgba(106,154,123,0.11);
+    --ocre-bg:      rgba(201,123,75,0.10);
+    --azul-bg:      rgba(14,59,92,0.06);
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body:    'General Sans', system-ui, sans-serif;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family:var(--font-body); background:var(--crema); color:var(--carbon); overflow-x:hidden; }
+
+  /* ── NAV ── */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:200;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:1rem 5%;
+    background:rgba(245,242,236,0.95); backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(14,59,92,0.09);
+  }
+  .logo { font-family:var(--font-display); font-weight:600; font-size:1.45rem; color:var(--azul); text-decoration:none; letter-spacing:0.04em; }
+  .logo em { font-style:normal; color:var(--ocre); }
+  nav ul { list-style:none; display:flex; gap:2rem; align-items:center; }
+  nav a { font-family:var(--font-body); text-decoration:none; color:var(--texto-muted); font-size:0.875rem; font-weight:500; transition:color .2s; }
+  nav a:hover { color:var(--azul); }
+  .nav-cta { background:var(--azul)!important; color:var(--crema)!important; padding:.48rem 1.25rem!important; border-radius:4px!important; font-weight:600!important; letter-spacing:.03em!important; }
+  .nav-cta:hover { opacity:.82!important; }
+
+  /* ── BOTONES GLOBALES ── */
+  .btn { display:inline-flex; align-items:center; gap:.45rem; padding:.8rem 1.7rem; border-radius:4px; font-family:var(--font-body); font-weight:600; font-size:.88rem; letter-spacing:.03em; text-decoration:none; transition:all .2s; cursor:pointer; border:none; }
+  .btn-azul  { background:var(--azul); color:var(--crema); }
+  .btn-azul:hover { opacity:.84; transform:translateY(-2px); }
+  .btn-ocre  { background:var(--ocre); color:var(--crema); }
+  .btn-ocre:hover { opacity:.84; transform:translateY(-2px); }
+  .btn-borde { background:transparent; color:var(--azul); border:2px solid var(--azul); }
+  .btn-borde:hover { background:var(--azul); color:var(--crema); }
+
+  /* ── SECTION TAG ── */
+  .stag { display:inline-block; font-family:var(--font-body); font-size:.68rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--salvia); margin-bottom:.9rem; }
+  .stag-ocre { color:var(--ocre); }
+
+  /* ── REVEAL ── */
+  .reveal { opacity:0; transform:translateY(20px); transition:opacity .55s ease, transform .55s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  /* ════════════════ HERO ════════════════ */
+  .hero {
+    min-height:100vh;
+    display:grid; grid-template-columns:1fr 1fr; align-items:center;
+    padding:8rem 5% 4rem; gap:5rem;
+    background:var(--crema); position:relative; overflow:hidden;
+  }
+  .hero::before {
+    content:''; position:absolute; right:0; top:0; width:50%; height:100%;
+    background:var(--azul);
+    clip-path:polygon(12% 0,100% 0,100% 100%,0% 100%);
+    z-index:0;
+  }
+  .hero-left  { position:relative; z-index:1; }
+  .hero-right { position:relative; z-index:1; }
+
+  .hero-badge {
+    display:inline-flex; align-items:center; gap:.45rem;
+    background:var(--salvia-bg); border:1px solid rgba(106,154,123,.28);
+    color:var(--salvia); padding:.32rem .85rem; border-radius:2px;
+    font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+    margin-bottom:1.4rem;
+  }
+  .hero-badge::before { content:''; width:6px; height:6px; background:var(--salvia); border-radius:50%; animation:blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+  .hero h1 {
+    font-family:var(--font-display); font-size:clamp(2.5rem,4.5vw,3.9rem);
+    font-weight:700; line-height:1.06; letter-spacing:-.01em; color:var(--azul);
+    margin-bottom:1.4rem;
+  }
+  .hero h1 em { font-style:italic; color:var(--ocre); }
+
+  .hero-sub { font-size:1.05rem; line-height:1.78; color:var(--texto-muted); max-width:460px; margin-bottom:2rem; }
+
+  .hero-btns { display:flex; gap:1rem; flex-wrap:wrap; }
+
+  /* Card "próximamente" en el hero */
+  .hero-card {
+    border:1px solid rgba(245,242,236,.13); border-radius:6px; overflow:hidden;
+    cursor:default;
+  }
+  .hero-card-inner {
+    aspect-ratio:16/9; background:rgba(245,242,236,.04);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:1.1rem; padding:2rem; position:relative; border-bottom:3px solid var(--ocre);
+  }
+  .hero-icon-ring {
+    width:64px; height:64px; border:2px solid rgba(245,242,236,.3); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:1.8rem;
+  }
+  .hero-card-title {
+    font-family:var(--font-display); font-size:1rem; font-weight:600;
+    color:var(--crema); text-align:center; line-height:1.35; max-width:260px; opacity:.85;
+  }
+  .hero-coming {
+    position:absolute; top:.8rem; left:.8rem;
+    background:var(--ocre); color:var(--crema);
+    font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    padding:.22rem .65rem; border-radius:2px;
+  }
+  .hero-card-meta {
+    padding:.9rem 1.2rem; background:rgba(245,242,236,.04);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .hero-card-meta span { font-size:.73rem; color:rgba(245,242,236,.38); }
+  .hero-card-meta strong { font-size:.73rem; color:var(--salvia); font-weight:600; }
+
+  .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:.6rem; margin-top:.75rem; }
+  .stat-mini { background:rgba(245,242,236,.05); border:1px solid rgba(245,242,236,.09); border-radius:4px; padding:.85rem .7rem; text-align:center; }
+  .stat-mini .num { font-family:var(--font-display); font-size:1.5rem; font-weight:700; color:var(--ocre); line-height:1; }
+  .stat-mini .lbl { font-size:.65rem; color:rgba(245,242,236,.38); margin-top:.22rem; line-height:1.3; }
+
+  /* ════════════════ SOBRE ════════════════ */
+  .sobre { background:#fff; padding:7rem 5%; }
+  .sobre-grid { display:grid; grid-template-columns:1fr 1fr; gap:6rem; align-items:center; max-width:1100px; margin:0 auto; }
+  .sobre h2 { font-family:var(--font-display); font-size:clamp(1.9rem,3vw,2.75rem); font-weight:700; line-height:1.12; color:var(--azul); margin-bottom:1.3rem; }
+  .sobre p  { font-size:1.05rem; line-height:1.8; color:var(--texto-muted); margin-bottom:1rem; }
+  .cita { margin-top:1.7rem; padding:1.1rem 1.4rem; border-left:3px solid var(--ocre); background:var(--ocre-bg); }
+  .cita p { font-family:var(--font-display); font-style:italic; font-size:1.05rem; color:var(--azul); line-height:1.6; margin:0; }
+  .pilares { display:flex; flex-direction:column; gap:1rem; }
+  .pilar { display:flex; align-items:flex-start; gap:1rem; padding:1.1rem 1.2rem; border-radius:4px; background:var(--crema); border:1px solid rgba(14,59,92,.07); }
+  .pilar-icon { width:40px; height:40px; min-width:40px; border-radius:4px; background:var(--azul); display:flex; align-items:center; justify-content:center; }
+  .pilar-icon svg { fill:var(--crema); width:20px; height:20px; }
+  .pilar h4 { font-weight:600; font-size:.88rem; color:var(--azul); margin-bottom:.2rem; }
+  .pilar p  { font-size:.8rem; margin:0; color:var(--texto-muted); line-height:1.55; }
+
+  /* ════════════════ TEMAS (cards expandibles) ════════════════ */
+  .temas { padding:7rem 5%; background:var(--crema); }
+  .temas-header { text-align:center; max-width:580px; margin:0 auto 3.5rem; }
+  .temas-header h2 { font-family:var(--font-display); font-size:clamp(1.9rem,3vw,2.75rem); font-weight:700; line-height:1.12; color:var(--azul); margin-bottom:1rem; }
+  .temas-header p { color:var(--texto-muted); line-height:1.72; font-size:1rem; }
+
+  .topics-list { display:flex; flex-direction:column; gap:1rem; max-width:900px; margin:0 auto; }
+
+  /* ── Card colapsada ── */
+  .topic-card {
+    background:#fff; border-radius:6px;
+    border:1.5px solid rgba(14,59,92,.09);
+    overflow:hidden; transition:border-color .25s, box-shadow .25s;
+  }
+  .topic-card.open { border-color:var(--salvia); box-shadow:0 10px 40px rgba(14,59,92,.1); }
+
+  .topic-header {
+    display:flex; align-items:center; gap:1.2rem;
+    padding:1.3rem 1.5rem; cursor:pointer; user-select:none;
+    transition:background .2s;
+  }
+  .topic-header:hover { background:rgba(14,59,92,.03); }
+
+  .topic-icon {
+    width:48px; height:48px; min-width:48px; border-radius:6px;
+    display:flex; align-items:center; justify-content:center; font-size:1.5rem;
+  }
+  .t-azul-bg   { background:var(--azul); }
+  .t-carbon-bg { background:var(--carbon); }
+  .t-salvia-bg { background:var(--salvia); }
+  .t-ocre-bg   { background:var(--ocre); }
+
+  .topic-meta { flex:1; }
+  .topic-cat  { font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--salvia); margin-bottom:.3rem; }
+  .topic-meta h3 { font-family:var(--font-display); font-size:1.05rem; font-weight:600; line-height:1.3; color:var(--azul); }
+
+  .topic-pill {
+    font-size:.62rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    padding:.22rem .65rem; border-radius:2px; white-space:nowrap;
+  }
+  .pill-pronto   { background:rgba(14,59,92,.08);  color:var(--azul); }
+  .pill-nuevo    { background:var(--ocre);          color:var(--crema); }
+
+  .topic-chevron {
+    width:28px; height:28px; min-width:28px; border-radius:50%;
+    border:1.5px solid rgba(14,59,92,.15);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .3s, border-color .2s;
+  }
+  .topic-chevron svg { fill:none; stroke:var(--azul); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .topic-card.open .topic-chevron { transform:rotate(180deg); border-color:var(--salvia); }
+
+  /* ── Panel expandido ── */
+  .topic-panel { max-height:0; overflow:hidden; transition:max-height .45s ease; }
+  .topic-card.open .topic-panel { max-height:2000px; }
+
+  .topic-panel-inner { padding:0 1.5rem 1.8rem; border-top:1px solid rgba(14,59,92,.07); padding-top:1.5rem; }
+
+  /* Intro del tema */
+  .topic-intro { font-size:.95rem; color:var(--texto-muted); line-height:1.75; margin-bottom:1.5rem; }
+
+  /* Grid de nutrientes dentro del panel */
+  .nutri-mini-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:.75rem; margin-bottom:1.5rem; }
+
+  .nutri-mini {
+    background:var(--azul); border-radius:4px; padding:1rem .9rem;
+    transition:transform .2s;
+  }
+  .nutri-mini:hover { transform:translateY(-2px); }
+  .nutri-mini-num { font-size:.58rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ocre); margin-bottom:.35rem; }
+  .nutri-mini h5  { font-family:var(--font-display); font-size:.9rem; font-weight:600; color:var(--crema); margin-bottom:.28rem; }
+  .nutri-mini p   { font-size:.7rem; color:rgba(245,242,236,.5); line-height:1.5; }
+  .nutri-mini-foods { font-size:.65rem; color:var(--salvia); margin-top:.4rem; font-weight:500; line-height:1.4; }
+
+  /* Separador de sección dentro del panel */
+  .panel-sep { display:flex; align-items:center; gap:.8rem; margin:1.6rem 0 1.3rem; }
+  .panel-sep span { font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--ocre); white-space:nowrap; }
+  .panel-sep::before, .panel-sep::after { content:''; flex:1; height:1px; background:rgba(14,59,92,.1); }
+
+  /* Grid de productos afiliados dentro del panel */
+  .afil-mini-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:.75rem; margin-bottom:1.5rem; }
+
+  .afil-mini {
+    border:1.5px solid rgba(14,59,92,.1); border-radius:4px;
+    padding:1rem .9rem; background:var(--crema);
+    display:flex; flex-direction:column;
+    transition:border-color .2s, transform .2s;
+  }
+  .afil-mini:hover { border-color:var(--salvia); transform:translateY(-2px); }
+  .afil-mini-icon { font-size:1.3rem; margin-bottom:.5rem; }
+  .afil-mini h5 { font-weight:600; font-size:.82rem; color:var(--azul); margin-bottom:.3rem; }
+  .afil-mini p  { font-size:.72rem; color:var(--texto-muted); line-height:1.5; flex:1; margin-bottom:.7rem; }
+  .afil-mini a  {
+    display:block; text-align:center; background:var(--azul);
+    color:var(--crema); padding:.45rem .6rem; border-radius:3px;
+    font-size:.72rem; font-weight:700; letter-spacing:.03em; text-decoration:none;
+    transition:opacity .2s;
+  }
+  .afil-mini a:hover { opacity:.8; }
+
+  /* CTA dentro del panel */
+  .panel-cta {
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    gap:1rem; padding:1.1rem 1.3rem;
+    background:var(--azul); border-radius:4px;
+  }
+  .panel-cta p { font-size:.88rem; color:rgba(245,242,236,.7); line-height:1.5; }
+  .panel-cta p strong { color:var(--crema); font-weight:600; }
+  .panel-cta-link {
+    display:inline-flex; align-items:center; gap:.4rem;
+    background:var(--ocre); color:var(--crema);
+    padding:.65rem 1.3rem; border-radius:4px;
+    font-size:.82rem; font-weight:700; letter-spacing:.03em;
+    text-decoration:none; white-space:nowrap; transition:opacity .2s;
+  }
+  .panel-cta-link:hover { opacity:.85; }
+
+  /* Disclaimer afiliado */
+  .afil-note { font-size:.68rem; color:var(--texto-muted); line-height:1.6; margin-top:1rem; }
+
+  /* ════════════════ NEWSLETTER ════════════════ */
+  .newsletter { background:var(--azul); padding:6rem 5%; text-align:center; }
+  .newsletter h2 { font-family:var(--font-display); font-size:clamp(1.9rem,3vw,2.75rem); font-weight:700; color:var(--crema); margin-bottom:1rem; }
+  .newsletter p  { color:rgba(245,242,236,.55); font-size:1rem; line-height:1.75; margin-bottom:2rem; max-width:460px; margin-left:auto; margin-right:auto; }
+  .nl-form { display:flex; gap:.75rem; max-width:430px; margin:0 auto; }
+  .nl-form input  { flex:1; padding:.85rem 1.1rem; border-radius:4px; border:1px solid rgba(245,242,236,.18); background:rgba(245,242,236,.07); color:var(--crema); font-family:var(--font-body); font-size:.9rem; outline:none; }
+  .nl-form input::placeholder { color:rgba(245,242,236,.28); }
+  .nl-form button { background:var(--ocre); color:var(--crema); padding:.85rem 1.4rem; border-radius:4px; border:none; font-family:var(--font-body); font-weight:700; font-size:.83rem; letter-spacing:.04em; cursor:pointer; white-space:nowrap; transition:opacity .2s; }
+  .nl-form button:hover { opacity:.82; }
+
+  /* ════════════════ FOOTER ════════════════ */
+  footer { background:var(--carbon); padding:2.4rem 5%; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+  .footer-logo { font-family:var(--font-display); font-size:1.3rem; font-weight:600; color:var(--crema); letter-spacing:.04em; }
+  .footer-logo em { font-style:normal; color:var(--ocre); }
+  footer p { font-size:.73rem; color:rgba(245,242,236,.27); font-family:var(--font-body); }
+  .footer-links { display:flex; gap:1.5rem; }
+  .footer-links a { color:rgba(245,242,236,.3); text-decoration:none; font-size:.73rem; font-weight:500; transition:color .2s; }
+  .footer-links a:hover { color:var(--salvia); }
+
+  /* ════════════════ RESPONSIVE ════════════════ */
+  @media(max-width:900px) {
+    nav ul { display:none; }
+    .hero { grid-template-columns:1fr; padding:7rem 5% 4rem; gap:3rem; }
+    .hero::before { display:none; }
+    .sobre-grid { grid-template-columns:1fr; gap:3rem; }
+    .nutri-mini-grid { grid-template-columns:repeat(2,1fr); }
+    .afil-mini-grid  { grid-template-columns:repeat(2,1fr); }
+  }
+  @media(max-width:600px) {
+    .nl-form { flex-direction:column; }
+    footer { flex-direction:column; text-align:center; }
+    .nutri-mini-grid { grid-template-columns:1fr 1fr; }
+    .afil-mini-grid  { grid-template-columns:1fr 1fr; }
+    .panel-cta { flex-direction:column; text-align:center; }
+    .topic-chevron { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <a href="#" class="logo">Clar<em>k</em></a>
+  <ul>
+    <li><a href="#sobre">El canal</a></li>
+    <li><a href="#temas">Temas</a></li>
+    <li><a href="#newsletter">Newsletter</a></li>
+    <li><a href="https://www.youtube.com/@clarkmedic" class="nav-cta" target="_blank">Suscribirme</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-badge">Canal en camino</div>
+    <h1>Entendé lo que<br>le pasa a tu <em>cuerpo</em></h1>
+    <p class="hero-sub">Información clara, directa y sin tecnicismos para adultos de 40+. Sin alarmismo. El primer video llega pronto — suscribite para no perdértelo.</p>
+    <div class="hero-btns">
+      <a href="https://www.youtube.com/@clarkmedic" class="btn btn-azul" target="_blank">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+        Suscribirme en YouTube
+      </a>
+      <a href="#temas" class="btn btn-borde">Ver los temas</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-card">
+      <div class="hero-card-inner">
+        <span class="hero-coming">Primer video — próximamente</span>
+        <div class="hero-icon-ring">👂</div>
+        <p class="hero-card-title">Si tus oídos suenan todo el tiempo, tu cuerpo te está avisando algo</p>
+      </div>
+      <div class="hero-card-meta">
+        <span>Tinnitus · Nutrición · ~10 min</span>
+        <strong>En preparación</strong>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-mini">
+        <div class="num">50%</div>
+        <div class="lbl">déficit de B12 en tinnitus</div>
+      </div>
+      <div class="stat-mini">
+        <div class="num">8</div>
+        <div class="lbl">nutrientes que trabaja el video</div>
+      </div>
+      <div class="stat-mini">
+        <div class="num">40+</div>
+        <div class="lbl">riesgo aumentado</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SOBRE ══ -->
+<section class="sobre" id="sobre">
+  <div class="sobre-grid">
+    <div class="reveal">
+      <span class="stag">¿Qué es Clark?</span>
+      <h2>La voz que no encontraste en la consulta de 8 minutos</h2>
+      <p>Clark es un canal de divulgación de salud para adultos de 40 a 55 años. Explica de forma clara y directa qué le pasa al cuerpo cuando algo no funciona bien, y cómo la nutrición puede ayudar.</p>
+      <p>No es un canal médico. No es alarmista. No promete curas milagrosas.</p>
+      <div class="cita">
+        <p>"Entender lo que tu cuerpo te está avisando, en lenguaje claro."</p>
+      </div>
+    </div>
+    <div class="pilares reveal">
+      <div class="pilar">
+        <div class="pilar-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+        <div><h4>Claridad total</h4><p>Cero tecnicismos. Si una abuela de 68 años no lo entiende, hay que reescribirlo.</p></div>
+      </div>
+      <div class="pilar">
+        <div class="pilar-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div>
+        <div><h4>Evidencia sin abrumar</h4><p>Cada dato tiene base científica, pero no se cita el paper. Se traduce al lenguaje humano.</p></div>
+      </div>
+      <div class="pilar">
+        <div class="pilar-icon"><svg viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+        <div><h4>Siempre accionable</h4><p>Cada video termina con algo concreto que podés empezar hoy, sin esperar turno médico.</p></div>
+      </div>
+      <div class="pilar">
+        <div class="pilar-icon"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg></div>
+        <div><h4>Calma, no clickbait</h4><p>El tono es el opuesto del alarmismo sanitario. Nada de "el cáncer que tu médico te oculta".</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TEMAS EXPANDIBLES ══ -->
+<section class="temas" id="temas">
+  <div class="temas-header reveal">
+    <span class="stag">Contenido del canal</span>
+    <h2>Temas que importan después de los 40</h2>
+    <p>Hacé click en cualquier tema para ver el resumen, los nutrientes clave y los productos recomendados.</p>
+  </div>
+
+  <div class="topics-list">
+
+    <!-- ─── TEMA 1: TINNITUS ─── -->
+    <div class="topic-card reveal" id="topic-1">
+      <div class="topic-header" onclick="toggleTopic('topic-1')">
+        <div class="topic-icon t-azul-bg">👂</div>
+        <div class="topic-meta">
+          <div class="topic-cat">Oídos · Nutrición</div>
+          <h3>Si tus oídos suenan todo el tiempo, tu cuerpo te está avisando algo</h3>
+        </div>
+        <span class="topic-pill pill-pronto">Próximamente</span>
+        <div class="topic-chevron">
+          <svg width="12" height="12" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="topic-panel">
+        <div class="topic-panel-inner">
+          <p class="topic-intro">El zumbido de oídos (tinnitus) afecta al 10–15% de adultos y su frecuencia aumenta a partir de los 40. En muchos casos no es una enfermedad sin solución — es una señal de que ciertos nutrientes esenciales están bajando. Este video te muestra cuáles son y dónde encontrarlos.</p>
+
+          <span class="stag">Los 8 nutrientes del oído interno</span>
+          <div class="nutri-mini-grid">
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°1 — El más importante</div>
+              <h5>Vitamina B12</h5>
+              <p>Produce mielina que protege el nervio auditivo. El 50% de personas con tinnitus crónico tienen deficiencia.</p>
+              <div class="nutri-mini-foods">Carne · Pescado · Huevos · Lácteos</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°2</div>
+              <h5>Magnesio</h5>
+              <p>Protege las células ciliadas del daño por ruidos fuertes y mantiene la circulación al oído.</p>
+              <div class="nutri-mini-foods">Banana · Almendras · Espinaca</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°3</div>
+              <h5>Zinc</h5>
+              <p>Altísima concentración en el oído interno. Su déficit hace las estructuras auditivas más vulnerables.</p>
+              <div class="nutri-mini-foods">Mariscos · Carne roja · Frutos secos</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°4</div>
+              <h5>Vitamina D</h5>
+              <p>Receptores en el nervio auditivo. La deficiencia aumenta el riesgo de tinnitus en adultos mayores.</p>
+              <div class="nutri-mini-foods">Sol · Salmón · Yema de huevo</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°5</div>
+              <h5>Potasio</h5>
+              <p>Regula la endolinfa, el líquido del oído que permite la transmisión del sonido.</p>
+              <div class="nutri-mini-foods">Banana · Papa · Espinaca · Yogur</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°6</div>
+              <h5>Vitamina C</h5>
+              <p>Antioxidante que protege las células auditivas del estrés oxidativo.</p>
+              <div class="nutri-mini-foods">Kiwi · Naranja · Morrón · Brócoli</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°7</div>
+              <h5>Vitamina E</h5>
+              <p>Protege membranas de células auditivas. Más efectiva combinada con vitamina C.</p>
+              <div class="nutri-mini-foods">Aceite de oliva · Almendras · Semillas</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°8</div>
+              <h5>Ácido fólico</h5>
+              <p>Colabora con la B12 en la producción de mielina y la salud del sistema nervioso.</p>
+              <div class="nutri-mini-foods">Espinaca · Lentejas · Espárragos</div>
+            </div>
+          </div>
+
+          <div class="panel-sep"><span>Productos recomendados</span></div>
+          <div class="afil-mini-grid">
+            <div class="afil-mini">
+              <div class="afil-mini-icon">💊</div>
+              <h5>Vitamina B12 Sublingual</h5>
+              <p>Metilcobalamina de absorción rápida. Ideal para adultos de 40+ que absorben menos B12 de los alimentos.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+            <div class="afil-mini">
+              <div class="afil-mini-icon">🧲</div>
+              <h5>Magnesio Glicinato</h5>
+              <p>La forma más absorbible de magnesio. Sin malestar digestivo y alta biodisponibilidad.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+            <div class="afil-mini">
+              <div class="afil-mini-icon">☀️</div>
+              <h5>Vitamina D3 + K2</h5>
+              <p>Combinación ideal para absorber la D correctamente. Para quienes trabajan en interiores.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+            <div class="afil-mini">
+              <div class="afil-mini-icon">💉</div>
+              <h5>Complejo B — 8 vitaminas</h5>
+              <p>B12 + ácido fólico + B6 en un suplemento. Para apoyar el sistema nervioso y auditivo.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+          </div>
+
+          <div class="panel-cta">
+            <p><strong>El video completo llega pronto.</strong><br>Suscribite para verlo en cuanto salga.</p>
+            <a href="https://www.youtube.com/@clarkmedic" class="panel-cta-link" target="_blank">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+              Suscribirme en YouTube
+            </a>
+          </div>
+          <p class="afil-note">* Como afiliado de Amazon, Clark puede recibir una comisión por compras a través de estos enlaces, sin costo adicional para vos. Consultá siempre a tu médico antes de tomar suplementos.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TEMA 2: SUEÑO ─── -->
+    <div class="topic-card reveal" id="topic-2">
+      <div class="topic-header" onclick="toggleTopic('topic-2')">
+        <div class="topic-icon t-carbon-bg">💤</div>
+        <div class="topic-meta">
+          <div class="topic-cat">Sueño · Hormonas</div>
+          <h3>Por qué te despertás a las 3am y qué le pasa a tu cortisol</h3>
+        </div>
+        <span class="topic-pill pill-pronto">Próximamente</span>
+        <div class="topic-chevron">
+          <svg width="12" height="12" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="topic-panel">
+        <div class="topic-panel-inner">
+          <p class="topic-intro">Despertarse a mitad de la noche no es simplemente "dormir mal". A partir de los 40, los niveles de cortisol y melatonina cambian de forma natural — y hay nutrientes concretos que ayudan a regular esos ciclos sin recurrir a medicación.</p>
+
+          <span class="stag">Nutrientes clave para el sueño</span>
+          <div class="nutri-mini-grid">
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°1</div>
+              <h5>Magnesio L-treonato</h5>
+              <p>La forma de magnesio que cruza la barrera hematoencefálica. Regula el GABA y mejora la profundidad del sueño.</p>
+              <div class="nutri-mini-foods">Semillas · Almendras · Espinaca</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°2</div>
+              <h5>Melatonina</h5>
+              <p>Hormona del sueño que decrece con la edad. Su producción depende del triptófano y la vitamina B6.</p>
+              <div class="nutri-mini-foods">Cerezas · Nueces · Avena · Banana</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°3</div>
+              <h5>Vitamina B6</h5>
+              <p>Convierte el triptófano en serotonina y luego en melatonina. Esencial para el ciclo circadiano.</p>
+              <div class="nutri-mini-foods">Atún · Pollo · Papa · Banana</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°4</div>
+              <h5>Ashwagandha</h5>
+              <p>Adaptógeno que baja el cortisol nocturno. Estudios muestran mejoras en latencia y calidad del sueño.</p>
+              <div class="nutri-mini-foods">Principalmente en suplemento</div>
+            </div>
+          </div>
+
+          <div class="panel-sep"><span>Productos recomendados</span></div>
+          <div class="afil-mini-grid">
+            <div class="afil-mini">
+              <div class="afil-mini-icon">🧠</div>
+              <h5>Magnesio L-Treonato</h5>
+              <p>Formulación específica para el sistema nervioso central. Ideal para sueño profundo y cognición.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+            <div class="afil-mini">
+              <div class="afil-mini-icon">🌙</div>
+              <h5>Melatonina 0.5mg</h5>
+              <p>Dosis baja fisiológica — más efectiva que las altas dosis. Para regular el ciclo sin dependencia.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+            <div class="afil-mini">
+              <div class="afil-mini-icon">🌿</div>
+              <h5>Ashwagandha KSM-66</h5>
+              <p>El extracto más estudiado. Reduce cortisol, mejora el sueño y reduce el estrés en 8 semanas.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+            <div class="afil-mini">
+              <div class="afil-mini-icon">💊</div>
+              <h5>Vitamina B6 Activa (P5P)</h5>
+              <p>Forma activa de B6, lista para usar sin conversión hepática. Clave para producir melatonina.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+          </div>
+
+          <div class="panel-cta">
+            <p><strong>Este video está en preparación.</strong><br>Suscribite para recibirlo en cuanto salga.</p>
+            <a href="https://www.youtube.com/@clarkmedic" class="panel-cta-link" target="_blank">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+              Suscribirme en YouTube
+            </a>
+          </div>
+          <p class="afil-note">* Como afiliado de Amazon, Clark puede recibir una comisión por compras a través de estos enlaces, sin costo adicional para vos. Consultá siempre a tu médico antes de tomar suplementos.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TEMA 3: NIEBLA MENTAL ─── -->
+    <div class="topic-card reveal" id="topic-3">
+      <div class="topic-header" onclick="toggleTopic('topic-3')">
+        <div class="topic-icon t-salvia-bg">🧠</div>
+        <div class="topic-meta">
+          <div class="topic-cat">Cerebro · Memoria</div>
+          <h3>La niebla mental no es normal — lo que nadie te dijo sobre la vitamina B</h3>
+        </div>
+        <span class="topic-pill pill-pronto">Próximamente</span>
+        <div class="topic-chevron">
+          <svg width="12" height="12" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="topic-panel">
+        <div class="topic-panel-inner">
+          <p class="topic-intro">Olvidar palabras, sentir que "la cabeza está lenta" o perder el hilo en conversaciones no es simplemente estrés. A partir de los 40 hay deficiencias nutricionales específicas que afectan directamente la función cognitiva — y tienen solución concreta.</p>
+
+          <span class="stag">Nutrientes clave para la cognición</span>
+          <div class="nutri-mini-grid">
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°1</div>
+              <h5>Vitamina B12</h5>
+              <p>Fundamental para la mielina neuronal. Su déficit genera lentitud mental, niebla y fallos de memoria.</p>
+              <div class="nutri-mini-foods">Carne · Pescado · Huevos · Lácteos</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°2</div>
+              <h5>Omega-3 DHA</h5>
+              <p>El principal componente estructural del cerebro. La falta de DHA se asocia con deterioro cognitivo.</p>
+              <div class="nutri-mini-foods">Salmón · Sardinas · Nueces · Semillas</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°3</div>
+              <h5>Ácido fólico (B9)</h5>
+              <p>Junto con la B12, controla la homocisteína — un aminoácido que en niveles altos daña el cerebro.</p>
+              <div class="nutri-mini-foods">Espinaca · Lentejas · Espárragos</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°4</div>
+              <h5>Vitamina D</h5>
+              <p>Receptores en todo el cerebro. Su deficiencia se asocia con depresión leve, niebla y menor concentración.</p>
+              <div class="nutri-mini-foods">Sol · Salmón · Yema de huevo</div>
+            </div>
+          </div>
+
+          <div class="panel-sep"><span>Productos recomendados</span></div>
+          <div class="afil-mini-grid">
+            <div class="afil-mini">
+              <div class="afil-mini-icon">🐟</div>
+              <h5>Omega-3 DHA de alta pureza</h5>
+              <p>Certificado sin metales pesados. Con al menos 500mg de DHA por cápsula para efecto cognitivo.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+            <div class="afil-mini">
+              <div class="afil-mini-icon">💊</div>
+              <h5>Vitamina B12 + B9 + B6</h5>
+              <p>El trío para controlar homocisteína y proteger el sistema nervioso. Formato sublingual.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+            <div class="afil-mini">
+              <div class="afil-mini-icon">🍄</div>
+              <h5>Lion's Mane (Melena de León)</h5>
+              <p>Hongo con evidencia en estimulación del NGF (factor de crecimiento nervioso) y cognición.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+            <div class="afil-mini">
+              <div class="afil-mini-icon">☀️</div>
+              <h5>Vitamina D3 5000 UI</h5>
+              <p>Para adultos con trabajo en interiores o poca exposición solar. Con K2 para absorción óptima.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+          </div>
+
+          <div class="panel-cta">
+            <p><strong>Este video está en preparación.</strong><br>Suscribite para recibirlo en cuanto salga.</p>
+            <a href="https://www.youtube.com/@clarkmedic" class="panel-cta-link" target="_blank">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+              Suscribirme en YouTube
+            </a>
+          </div>
+          <p class="afil-note">* Como afiliado de Amazon, Clark puede recibir una comisión por compras a través de estos enlaces, sin costo adicional para vos. Consultá siempre a tu médico antes de tomar suplementos.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TEMA 4: FATIGA ─── -->
+    <div class="topic-card reveal" id="topic-4">
+      <div class="topic-header" onclick="toggleTopic('topic-4')">
+        <div class="topic-icon t-ocre-bg">🫀</div>
+        <div class="topic-meta">
+          <div class="topic-cat">Corazón · Energía</div>
+          <h3>Ese cansancio que no se va: lo que tu corazón está intentando decirte</h3>
+        </div>
+        <span class="topic-pill pill-pronto">Próximamente</span>
+        <div class="topic-chevron">
+          <svg width="12" height="12" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="topic-panel">
+        <div class="topic-panel-inner">
+          <p class="topic-intro">La fatiga crónica en adultos de mediana edad raramente es "solo estrés". Hay tres deficiencias nutricionales concretas que el sistema cardiovascular necesita para producir energía eficientemente — y que rara vez se detectan en un análisis de rutina.</p>
+
+          <span class="stag">Nutrientes clave para la energía y el corazón</span>
+          <div class="nutri-mini-grid">
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°1</div>
+              <h5>CoQ10 (Ubiquinol)</h5>
+              <p>Molécula central en la producción de ATP mitocondrial. Decrece naturalmente a partir de los 40.</p>
+              <div class="nutri-mini-foods">Carne · Pescado · Frutos secos</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°2</div>
+              <h5>Hierro bisglicinato</h5>
+              <p>El déficit de hierro es la causa más común de fatiga en adultos, especialmente mujeres de 40+.</p>
+              <div class="nutri-mini-foods">Carne roja · Lentejas · Espinaca</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°3</div>
+              <h5>Vitamina B12</h5>
+              <p>Necesaria para producir glóbulos rojos. Su déficit genera anemia y fatiga profunda.</p>
+              <div class="nutri-mini-foods">Carne · Pescado · Huevos · Lácteos</div>
+            </div>
+            <div class="nutri-mini">
+              <div class="nutri-mini-num">N°4</div>
+              <h5>Magnesio</h5>
+              <p>Interviene en más de 300 reacciones enzimáticas incluyendo la producción de energía celular.</p>
+              <div class="nutri-mini-foods">Almendras · Espinaca · Banana</div>
+            </div>
+          </div>
+
+          <div class="panel-sep"><span>Productos recomendados</span></div>
+          <div class="afil-mini-grid">
+            <div class="afil-mini">
+              <div class="afil-mini-icon">⚡</div>
+              <h5>CoQ10 Ubiquinol 200mg</h5>
+              <p>Forma activa y biodisponible de CoQ10. La versión Ubiquinol es la más absorbible para mayores de 40.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+            <div class="afil-mini">
+              <div class="afil-mini-icon">🩸</div>
+              <h5>Hierro Bisglicinato</h5>
+              <p>Sin estreñimiento ni malestar estomacal. Alta absorción sin los efectos secundarios del hierro ferroso.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+            <div class="afil-mini">
+              <div class="afil-mini-icon">💊</div>
+              <h5>Vitamina B12 Sublingual</h5>
+              <p>Metilcobalamina de absorción directa. Clave para producir glóbulos rojos y combatir la fatiga.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+            <div class="afil-mini">
+              <div class="afil-mini-icon">🧲</div>
+              <h5>Magnesio Malato</h5>
+              <p>Forma de magnesio específica para producción de energía muscular. Ideal para fatiga crónica.</p>
+              <a href="https://amazon.com" target="_blank">Ver en Amazon →</a>
+            </div>
+          </div>
+
+          <div class="panel-cta">
+            <p><strong>Este video está en preparación.</strong><br>Suscribite para recibirlo en cuanto salga.</p>
+            <a href="https://www.youtube.com/@clarkmedic" class="panel-cta-link" target="_blank">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+              Suscribirme en YouTube
+            </a>
+          </div>
+          <p class="afil-note">* Como afiliado de Amazon, Clark puede recibir una comisión por compras a través de estos enlaces, sin costo adicional para vos. Consultá siempre a tu médico antes de tomar suplementos.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /topics-list -->
+</section>
+
+<!-- ══ NEWSLETTER ══ -->
+<section class="newsletter" id="newsletter">
+  <h2>El primer video llega pronto.<br>No te lo pierdas.</h2>
+  <p>Suscribite al canal y avisamos en cuanto salga. También podés dejar tu correo para recibir el resumen de cada video directo en tu bandeja.</p>
+  <form class="nl-form" onsubmit="return false;">
+    <input type="email" placeholder="tu@email.com">
+    <button type="submit">Avisarme</button>
+  </form>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-logo">Clar<em>k</em></div>
+  <p>© 2026 Clark — Solo informativo, no reemplaza la consulta médica.</p>
+  <div class="footer-links">
+    <a href="https://www.youtube.com/@clarkmedic" target="_blank">YouTube</a>
+    <a href="#">Instagram</a>
+    <a href="#">TikTok</a>
+    <a href="#">Contacto</a>
+  </div>
+</footer>
+
+<script>
+  /* ── Acordeón de temas ── */
+  function toggleTopic(id) {
+    const card = document.getElementById(id);
+    const isOpen = card.classList.contains('open');
+    // Cerrar todos
+    document.querySelectorAll('.topic-card').forEach(c => c.classList.remove('open'));
+    // Abrir el clickeado si estaba cerrado
+    if (!isOpen) card.classList.add('open');
+  }
+
+  /* ── Reveal en scroll ── */
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 70);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.07 });
+  reveals.forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
